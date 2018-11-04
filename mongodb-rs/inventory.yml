@@ -1,0 +1,42 @@
+[mongodb]
+mongo1 ansible_ssh_host=172.21.0.114 mongodb_id=0 mongodb_priority=10
+mongo2 ansible_ssh_host=172.21.0.26 mongodb_id=1 mongodb_priority=9
+mongo3 ansible_ssh_host=172.21.0.27 mongodb_id=2 mongodb_priority=8
+
+[elk]
+172.21.1.[8:11]
+
+[docker]
+172.21.1.[5:7]
+
+[kafka]
+172.21.1.[12:14]
+
+[mysql]
+172.21.1.[19:21]
+
+[redis]
+172.21.1.[21:23]
+
+[zookeeper]
+172.21.1.[24:26]
+
+[car2share:children]
+mongodb
+elk
+docker
+kafka
+mysql
+redis
+zookeeper
+
+[running:children]
+mongodb
+elk
+kafka
+zookeeper
+
+[dbase:children]
+mongodb
+mysql
+redis

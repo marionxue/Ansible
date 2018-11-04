@@ -1,0 +1,13 @@
+#!/bin/bash 
+#Rotate the MongoDB logs to prevent a single logfile from consuming too much disk space. 
+mongodPath=/usr/bin 
+ 
+pidArray=$(pidof $mongodPath/mongod) 
+ 
+for pid in $pidArray;do 
+   if [ $pid ];then 
+        kill -SIGUSR1 $pid 
+   fi 
+done 
+exit
+

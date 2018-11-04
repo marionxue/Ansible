@@ -1,0 +1,15 @@
+---
+- name: copy exporter files to target machine
+  copy: src=exporter dest=/opt/ansible/
+  
+- name: copy init script to {{ ansible_ssh_host }}
+  template:
+    src: templates/runexporter.sh.j2
+    dest: /usr/local/sbin/runexporter.sh
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Excute runexporter.sh
+  command: "/usr/local/sbin/runexporter.sh"
+

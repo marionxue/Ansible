@@ -1,0 +1,9 @@
+---
+  - hosts: mongodb
+    remote_user: root
+    gather_facts: yes
+    roles:
+     - mongodb
+     - exporter
+
+...

@@ -1,0 +1,4 @@
+---
+dbpath: /data/mongodb/data
+logpath: /var/log/mongodb
+pidfilepath: /var/run

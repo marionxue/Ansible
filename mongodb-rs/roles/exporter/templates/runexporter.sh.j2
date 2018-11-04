@@ -1,0 +1,26 @@
+#!/bin/bash
+exporterpath="/opt/ansible/exporter"
+mongodb_exporter="mongodb_exporter-linux-amd64"
+node_tar_exporter="node_exporter-0.16.0.linux-amd64.tar.gz"
+
+
+if [ -f ${exporterpath}/${node_tar_exporter} ];then
+  cd ${exporterpath}
+  tar xf ${exporterpath}/${node_tar_exporter}
+  chmod +x ${exporterpath}/node_exporter-0.16.0.linux-amd64/node_exporter
+  `which nohup` ${exporterpath}/node_exporter-0.16.0.linux-amd64/node_exporter &
+else
+  exit 3
+fi
+
+
+if [ -f ${exporterpath}/${mongodb_exporter} ];then
+  if [ -x ${exporterpath}/${mongodb_exporter} ];then
+    `which nohup` ${exporterpath}/${mongodb_exporter} -mongodb.uri mongodb://{{ ansible_ssh_host }}:27017 &
+  else
+    chmod +x ${exporterpath}/${mongodb_exporter}
+    `which nohup` ${exporterpath}/${mongodb_exporter} -mongodb.uri mongodb://{{ ansible_ssh_host }}:27017 &
+  fi
+else
+  exit 3
+fi

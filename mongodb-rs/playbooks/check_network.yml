@@ -1,0 +1,5 @@
+---
+  - hosts: mongodb
+    tasks:
+      - name: check network
+        ping:

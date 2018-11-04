@@ -1,0 +1,89 @@
+---
+  - name: Stop SuSEfirewall2 service
+    service: name=SuSEfirewall2 state=stopped enabled=no
+
+  - name: Import Mongodb Key
+    rpm_key:
+      state: present
+      key: https://www.mongodb.org/static/pgp/server-3.4.asc
+
+  - name: Add Mongodb repository
+    zypper_repository:
+      repo: "https://repo.mongodb.org/zypper/suse/12/mongodb-org/3.4/x86_64/"
+      name: mongodb-3.4
+      state: present
+      enabled: yes
+    when: ansible_os_family == 'Suse'
+      
+  - name: Add suse12 sp3 base repo
+    zypper_repository:
+      repo: "http://download.opensuse.org/repositories/systemsmanagement/SLE_12_SP3/"
+      name: suse12-sp3
+      state: present
+      enabled: yes
+    when: ansible_os_family == 'Suse'
+
+  - name: Install mongodb-org packages on Suse12 sp1
+    zypper: 
+      name: mongodb-org
+      state: present
+      disable_gpg_check: yes
+      update_cache: yes
+    when: ansible_os_family == 'Suse'
+
+  - name: Install chrony service
+    zypper:
+      name: chrony
+      state: present
+      update_cache: yes
+    when: ansible_os_family == 'Suse'
+
+  - name: Stating Chronyd Service
+    service: name=chronyd state=started enabled=yes 
+  - name: "Creating multiple folders without disteubing previous permissions"
+    file:
+      path: "{{ item }}" 
+      state: directory
+      mode: 0755
+      group: mongod
+      owner: mongod
+    with_items:
+      - /data/mongodb/data
+      - /var/log/mongodb
+        
+  - name: Configure Mongodb configurefiles
+    template: 
+      src: templates/mongod.conf.j2
+      dest: /etc/mongod.conf
+      owner: mongod
+      group: mongod
+      backup: yes
+
+  - name: the script make mongodb log file to small
+    template:
+      src: templates/logRotate.sh.j2
+      dest: /usr/local/sbin/logRotate.sh
+      owner: root
+      group: root
+      mode: 0755
+  - name: copy repset_init js
+    template:
+      src: templates/repset_init.j2
+      dest: /tmp/repset_init.js
+      
+  - name: make an cronatb for logRotate.sh
+    cron:
+      name: small mongodb files
+      minute: "59"
+      hour: "23"
+      job: "/usr/local/sbin/logRotate.sh"
+      
+  - name: Running Mongodb instance
+    command: "mongod -f /etc/mongod.conf"
+
+  - name: initialize the replication set
+    shell: mongod --host "{{ansible_ssh_host}}" /tmp/repset_init.js
+
+
+
+...

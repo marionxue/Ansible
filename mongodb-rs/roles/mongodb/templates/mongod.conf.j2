@@ -1,0 +1,13 @@
+dbpath={{ dbpath }}
+logpath={{ logpath }}/mongodb.log
+pidfilepath={{ pidfilepath }}/mongodb.pid
+directoryperdb=true
+logappend=true
+replSet=rs1
+bind_ip={{ ansible_ssh_host }}
+smallfiles=true
+port=27017
+oplogSize=5120
+fork=true
+journal=true
+logRotate=rename
